@@ -199,5 +199,7 @@ FROM order_details od
 JOIN products p
 ON od.product_id = p.product_id
 GROUP BY p.product_id, p.product_name;
+select * from customers;
+-- new changes
 
 
