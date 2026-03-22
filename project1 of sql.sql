@@ -232,5 +232,50 @@ join products p
 on od.product_id = p.product_id
 group by p.product_id , p.product_name;
 
+-- Calculate running total of sales by date.
+select o.order_date ,sum(od.quantity*p.price) as daily_sales,
+sum(sum(od.quantity * p.price)) over (order by o.order_date) as running_totals
+from order_details od
+join products p
+on od.product_id = p.product_id
+join orders o
+on od.order_id = o.order_id
+group by o.order_date
+order by o.order_date;
 
+-- . Create a report showing customer name, product purchased, quantity, and order date.
+select c.name, p.product_name , o.order_date, od.quantity 
+from customers c
+join orders o
+on o.customer_id = c.customer_id
+join order_details od
+on od.order_id = o.order_id
+join products p
+on p.product_id = od.product_id;
+
+-- . Find products where inventory stock is below a certain threshold.
+select p.product_id , p.product_name ,i.stock_quantity
+from inventory i
+join products p
+on p.product_id = i.product_id
+where i.stock_quantity < 100 ;
+
+-- . Find the top 5 customers based on total purchase amount.
+SELECT 
+    c.customer_id,
+    c.name,
+    SUM(od.quantity * p.price) AS total_purchase
+    FROM customers c
+JOIN orders o 
+    ON c.customer_id = o.customer_id
+JOIN order_details od 
+    ON o.order_id = od.order_id
+JOIN products p 
+    ON od.product_id = p.product_id
+
+GROUP BY c.customer_id, c.name
+ORDER BY total_purchase DESC
+LIMIT 5;
+
+-- Create a reusable view that shows total sales for each product.
 
