@@ -199,7 +199,38 @@ FROM order_details od
 JOIN products p
 ON od.product_id = p.product_id
 GROUP BY p.product_id, p.product_name;
-select * from customers;
--- new changes
+
+--  Find total revenue generated each month
+select month(o.order_date) as month,p.product_id , p.product_name,sum(od.quantity * p.price) as total_revenue
+from order_details od
+join products p
+on od.product_id = p.product_id
+join orders o
+on o.order_id = od.order_id
+group by p.product_id , p.product_name , month(o.order_date);
+
+-- Identify customers who never placed any orders.
+select customer_id , name from customers
+where customer_id not in  (select customer_id from orders );
+
+-- Find the most recent order placed by each customer.
+select customer_id , max(order_date) from orders
+group by customer_id;
+
+-- . Find the second highest selling product.
+select p.product_id , p.product_name,sum(od.quantity) as total_sales from order_details od
+join products p
+on od.product_id = p.product_id
+group by p.product_id , p.product_name
+order by total_sales desc;
+
+-- . Rank products based on total sales using ranking functions.
+select p.product_id , p.product_name , sum(od.quantity) as total_sales,
+rank() over(order by sum(od.quantity) desc) as rnk
+from order_details od
+join products p
+on od.product_id = p.product_id
+group by p.product_id , p.product_name;
+
 
 
